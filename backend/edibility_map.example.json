@@ -1,0 +1,8 @@
+{
+  "Agaricus_bisporus": "edible",
+  "Amanita_muscaria": "poisonous",
+  "Amanita_phalloides": "deadly",
+  "Cantharellus_cibarius": "edible",
+  "Galerina_marginata": "deadly",
+  "unknown_species_folder_name": "unknown"
+}

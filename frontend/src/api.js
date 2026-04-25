@@ -101,3 +101,26 @@ export const getFeatures = () =>
  */
 export const getStats = () =>
   fetchJson(`/stats`);
+
+/**
+ * Fetch computer-vision model availability and training metadata.
+ */
+export const getImageModelStatus = () =>
+  fetchJson(`/image-model/status`);
+
+/**
+ * Upload a mushroom image and get species + edibility predictions.
+ *
+ * @param {File} imageFile
+ * @param {number} topK
+ */
+export const predictImage = (imageFile, topK = 3) => {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+  formData.append("top_k", String(topK));
+
+  return fetchJson(`/predict-image`, {
+    method: "POST",
+    body: formData,
+  });
+};

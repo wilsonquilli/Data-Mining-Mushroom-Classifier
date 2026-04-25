@@ -6,7 +6,14 @@ import { Routes, Route, Link } from "react-router-dom";
 import Edible from "./pages/edible";
 import Poisonous from "./pages/poisonous";
 import ScrollToTop from "./components/scrolltotop";
-import { classifyBoth, getFeatureImportance, getFeatures, getStats } from "./api";
+import {
+  classifyBoth,
+  getFeatureImportance,
+  getFeatures,
+  getImageModelStatus,
+  getStats,
+  predictImage,
+} from "./api";
 
 const FEATURE_PICK_ORDER = [
   "odor",
@@ -54,8 +61,13 @@ function Home() {
   const [featureImportance, setFeatureImportance] = useState(null);
   const [selectedFeatures, setSelectedFeatures] = useState({});
   const [classification, setClassification] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imagePrediction, setImagePrediction] = useState(null);
+  const [imageModelStatus, setImageModelStatus] = useState(null);
   const [loadingHome, setLoadingHome] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [submittingImage, setSubmittingImage] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -85,6 +97,16 @@ function Home() {
             }
           });
           setSelectedFeatures(defaults);
+
+          try {
+            const statusResponse = await getImageModelStatus();
+            setImageModelStatus(statusResponse);
+          } catch (statusError) {
+            setImageModelStatus({
+              available: false,
+              error: statusError.message,
+            });
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -102,6 +124,18 @@ function Home() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreview("");
+      return undefined;
+    }
+
+    const previewUrl = URL.createObjectURL(imageFile);
+    setImagePreview(previewUrl);
+
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [imageFile]);
 
   function handleFeatureChange(featureName, value) {
     setSelectedFeatures((current) => ({
@@ -128,8 +162,39 @@ function Home() {
     }
   }
 
+  function handleImageChange(event) {
+    const file = event.target.files?.[0];
+    setImageFile(file || null);
+    setImagePrediction(null);
+  }
+
+  async function handleImagePredict(event) {
+    event.preventDefault();
+    if (!imageFile) {
+      setError("Choose a mushroom image before running image identification.");
+      return;
+    }
+
+    setSubmittingImage(true);
+    setError("");
+
+    try {
+      const result = await predictImage(imageFile, 3);
+      setImagePrediction(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmittingImage(false);
+    }
+  }
+
   const topRandomForestFeature = featureImportance?.random_forest?.[0];
   const topDecisionTreeFeature = featureImportance?.decision_tree?.[0];
+  const imageModelReady = imageModelStatus?.available;
+  const riskLabel = imagePrediction?.risk_label || imagePrediction?.edibility;
+  const riskIsUncertain = riskLabel === "uncertain" || riskLabel === "unknown-risk";
+  const speciesSuggestions = imagePrediction?.species_suggestions || imagePrediction?.top_predictions || [];
+  const topSpeciesCandidate = speciesSuggestions[0];
 
   return (
     <div className="bg-[linear-gradient(180deg,#fffdf7_0%,#fff7ef_38%,#ffffff_100%)] text-gray-900">
@@ -198,6 +263,169 @@ function Home() {
             label="DT Accuracy"
             value={loadingHome ? "..." : `${Math.round((stats?.dt_accuracy ?? 0) * 100)}%`}
           />
+        </div>
+      </section>
+
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <form
+            onSubmit={handleImagePredict}
+            className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-stone-500">
+                  Image Identification
+                </p>
+                <h2 className="mt-2 font-patua text-3xl text-stone-900">
+                  Upload a mushroom photo.
+                </h2>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                  imageModelReady
+                    ? "bg-green-100 text-green-700"
+                    : "bg-amber-100 text-amber-700"
+                }`}
+              >
+                {imageModelReady ? "Model Ready" : "Needs Training"}
+              </span>
+            </div>
+
+            <label className="mt-6 flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-stone-300 bg-stone-50 p-4 text-center transition hover:border-red-400">
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Selected mushroom preview"
+                  className="h-52 w-full rounded-2xl object-cover"
+                />
+              ) : (
+                <>
+                  <span className="font-patua text-xl text-stone-800">
+                    Choose Image
+                  </span>
+                  <span className="mt-2 text-sm text-stone-500">
+                    JPG, PNG, or WEBP mushroom photo
+                  </span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="sr-only"
+              />
+            </label>
+
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={!imageFile || submittingImage || !imageModelReady}
+                className="rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submittingImage ? "Identifying..." : "Identify Mushroom"}
+              </button>
+              {!imageModelReady && (
+                <span className="text-sm text-stone-500">
+                  Train the image model before photo predictions are available.
+                </span>
+              )}
+            </div>
+          </form>
+
+          <div className="rounded-[2rem] border border-stone-200 bg-[#fff7ef] p-6 shadow-sm">
+            <p className="text-sm uppercase tracking-[0.24em] text-stone-500">
+              Safety Result
+            </p>
+            {imagePrediction ? (
+              <div className="mt-5">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <h3 className={`font-patua text-3xl capitalize ${
+                      riskLabel === "edible"
+                        ? "text-green-700"
+                        : riskIsUncertain
+                          ? "text-amber-700"
+                          : "text-red-700"
+                    }`}>
+                      {riskLabel === "edible"
+                        ? "Likely edible"
+                        : riskIsUncertain
+                          ? "Uncertain - avoid eating"
+                          : "Avoid eating"}
+                    </h3>
+                    <p className="mt-2 text-sm text-stone-600">
+                      Safety confidence:{" "}
+                      {Math.round((imagePrediction.risk_confidence ?? 0) * 100)}%
+                    </p>
+                    {imagePrediction.risk_subtype && (
+                      <p className="mt-1 text-sm capitalize text-stone-600">
+                        Matched risk subtype: {imagePrediction.risk_subtype.replaceAll("_", " ")}
+                      </p>
+                    )}
+                    {topSpeciesCandidate && (
+                      <div className="mt-4 rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                          #1 Candidate
+                        </p>
+                        <p className="mt-1 font-patua text-2xl capitalize text-stone-900">
+                          {topSpeciesCandidate.species}
+                        </p>
+                        <p className="mt-1 text-sm text-stone-600">
+                          {Math.round(topSpeciesCandidate.confidence * 100)}% match ·{" "}
+                          {topSpeciesCandidate.edibility.replaceAll("_", " ")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${
+                      riskLabel === "edible"
+                        ? "bg-green-100 text-green-700"
+                        : riskIsUncertain
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {riskLabel.replaceAll("_", " ")}
+                  </span>
+                </div>
+
+                <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  Avoid eating unless confirmed by a qualified mushroom expert.
+                </p>
+
+                <div className="mt-6 space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                    Possible Matches
+                  </p>
+                  {speciesSuggestions.map((prediction) => (
+                    <div
+                      key={prediction.species_key}
+                      className="rounded-2xl bg-white px-4 py-3 text-sm"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="font-semibold capitalize text-stone-800">
+                          {prediction.species}
+                        </span>
+                        <span className="text-stone-500">
+                          {Math.round(prediction.confidence * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-5 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-600">
+                  {imagePrediction.warning}
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 rounded-3xl border border-dashed border-stone-300 bg-white/70 px-5 py-16 text-center text-sm text-stone-500">
+                Uploaded image predictions will appear here after the image model is trained.
+              </div>
+            )}
+          </div>
         </div>
       </section>
 

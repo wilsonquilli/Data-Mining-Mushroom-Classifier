@@ -30,220 +30,226 @@
   "total_samples": 8124,
   "edible_count": 4208,
   "poisonous_count": 3916,
-  "dataset_source": "/Users/wilito2401/Documents/Mushroom Classifier/backend/mushroom/agaricus-lepiota.data",
+  "dataset_source": "/Users/mostafa/Data-Mining-Mushroom-Classifier/backend/mushroom/agaricus-lepiota.data",
+  "noise_config": {
+    "noise_rate": 0.03,
+    "mask_rate": 0.05,
+    "drop_features": [],
+    "seed": 42
+  },
   "models": {
     "random_forest": {
-      "accuracy": 1.0,
+      "accuracy": 0.996923,
       "precision": 1.0,
-      "recall": 1.0,
-      "f1_score": 1.0,
-      "cross_val_mean": 0.885364,
-      "cross_val_std": 0.1624,
+      "recall": 0.993614,
+      "f1_score": 0.996797,
+      "cross_val_mean": 0.889804,
+      "cross_val_std": 0.133137,
       "confusion_matrix": [
         [
           842,
           0
         ],
         [
-          0,
-          783
+          5,
+          778
         ]
       ],
       "feature_importance": [
         {
           "feature": "odor",
-          "importance": 0.193744
+          "importance": 0.193352
         },
         {
           "feature": "gill-color",
-          "importance": 0.114487
-        },
-        {
-          "feature": "spore-print-color",
-          "importance": 0.106751
+          "importance": 0.113311
         },
         {
           "feature": "gill-size",
-          "importance": 0.098617
+          "importance": 0.105352
         },
         {
           "feature": "ring-type",
-          "importance": 0.070559
+          "importance": 0.084764
+        },
+        {
+          "feature": "spore-print-color",
+          "importance": 0.076634
         },
         {
           "feature": "stalk-root",
-          "importance": 0.067075
-        },
-        {
-          "feature": "population",
-          "importance": 0.056547
+          "importance": 0.06516
         },
         {
           "feature": "stalk-surface-above-ring",
-          "importance": 0.052588
+          "importance": 0.057097
         },
         {
           "feature": "bruises",
-          "importance": 0.046456
+          "importance": 0.053446
         },
         {
-          "feature": "stalk-surface-below-ring",
-          "importance": 0.028409
-        },
-        {
-          "feature": "habitat",
-          "importance": 0.027418
+          "feature": "population",
+          "importance": 0.045253
         },
         {
           "feature": "gill-spacing",
-          "importance": 0.025004
+          "importance": 0.034114
         },
         {
-          "feature": "stalk-color-above-ring",
-          "importance": 0.024496
+          "feature": "habitat",
+          "importance": 0.032362
         },
         {
-          "feature": "ring-number",
-          "importance": 0.019239
-        },
-        {
-          "feature": "stalk-color-below-ring",
-          "importance": 0.017353
-        },
-        {
-          "feature": "cap-color",
-          "importance": 0.016126
+          "feature": "stalk-surface-below-ring",
+          "importance": 0.028536
         },
         {
           "feature": "stalk-shape",
-          "importance": 0.015122
+          "importance": 0.020047
+        },
+        {
+          "feature": "stalk-color-above-ring",
+          "importance": 0.019443
+        },
+        {
+          "feature": "stalk-color-below-ring",
+          "importance": 0.017038
         },
         {
           "feature": "cap-surface",
-          "importance": 0.009579
+          "importance": 0.015349
+        },
+        {
+          "feature": "cap-color",
+          "importance": 0.014877
+        },
+        {
+          "feature": "ring-number",
+          "importance": 0.014686
         },
         {
           "feature": "cap-shape",
-          "importance": 0.003882
-        },
-        {
-          "feature": "gill-attachment",
-          "importance": 0.003327
+          "importance": 0.006166
         },
         {
           "feature": "veil-color",
-          "importance": 0.003219
+          "importance": 0.001597
+        },
+        {
+          "feature": "gill-attachment",
+          "importance": 0.001014
         },
         {
           "feature": "veil-type",
-          "importance": 0.0
+          "importance": 0.000404
         }
       ]
     },
     "decision_tree": {
-      "accuracy": 1.0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1_score": 1.0,
-      "cross_val_mean": 0.961591,
-      "cross_val_std": 0.04908,
+      "accuracy": 0.984615,
+      "precision": 0.979747,
+      "recall": 0.988506,
+      "f1_score": 0.984107,
+      "cross_val_mean": 0.902248,
+      "cross_val_std": 0.098653,
       "confusion_matrix": [
         [
-          842,
-          0
+          826,
+          16
         ],
         [
-          0,
-          783
+          9,
+          774
         ]
       ],
       "feature_importance": [
         {
           "feature": "gill-color",
-          "importance": 0.338633
-        },
-        {
-          "feature": "spore-print-color",
-          "importance": 0.21618
-        },
-        {
-          "feature": "population",
-          "importance": 0.177561
-        },
-        {
-          "feature": "gill-size",
-          "importance": 0.109882
+          "importance": 0.28553
         },
         {
           "feature": "odor",
-          "importance": 0.035568
+          "importance": 0.184581
         },
         {
-          "feature": "habitat",
-          "importance": 0.031613
+          "feature": "spore-print-color",
+          "importance": 0.176257
         },
         {
-          "feature": "bruises",
-          "importance": 0.029587
+          "feature": "gill-size",
+          "importance": 0.134359
         },
         {
-          "feature": "stalk-shape",
-          "importance": 0.023563
-        },
-        {
-          "feature": "stalk-color-below-ring",
-          "importance": 0.015961
-        },
-        {
-          "feature": "stalk-root",
-          "importance": 0.01151
-        },
-        {
-          "feature": "cap-color",
-          "importance": 0.00384
-        },
-        {
-          "feature": "stalk-surface-above-ring",
-          "importance": 0.002933
-        },
-        {
-          "feature": "stalk-surface-below-ring",
-          "importance": 0.001641
-        },
-        {
-          "feature": "ring-number",
-          "importance": 0.001528
-        },
-        {
-          "feature": "cap-shape",
-          "importance": 0.0
-        },
-        {
-          "feature": "cap-surface",
-          "importance": 0.0
-        },
-        {
-          "feature": "gill-attachment",
-          "importance": 0.0
-        },
-        {
-          "feature": "gill-spacing",
-          "importance": 0.0
-        },
-        {
-          "feature": "stalk-color-above-ring",
-          "importance": 0.0
-        },
-        {
-          "feature": "veil-type",
-          "importance": 0.0
-        },
-        {
-          "feature": "veil-color",
-          "importance": 0.0
+          "feature": "population",
+          "importance": 0.125207
         },
         {
           "feature": "ring-type",
+          "importance": 0.035549
+        },
+        {
+          "feature": "stalk-surface-below-ring",
+          "importance": 0.016643
+        },
+        {
+          "feature": "cap-color",
+          "importance": 0.005711
+        },
+        {
+          "feature": "ring-number",
+          "importance": 0.005433
+        },
+        {
+          "feature": "stalk-root",
+          "importance": 0.00539
+        },
+        {
+          "feature": "stalk-color-below-ring",
+          "importance": 0.004616
+        },
+        {
+          "feature": "habitat",
+          "importance": 0.003963
+        },
+        {
+          "feature": "bruises",
+          "importance": 0.00339
+        },
+        {
+          "feature": "stalk-surface-above-ring",
+          "importance": 0.003094
+        },
+        {
+          "feature": "stalk-shape",
+          "importance": 0.003062
+        },
+        {
+          "feature": "stalk-color-above-ring",
+          "importance": 0.002235
+        },
+        {
+          "feature": "gill-spacing",
+          "importance": 0.002162
+        },
+        {
+          "feature": "cap-surface",
+          "importance": 0.00186
+        },
+        {
+          "feature": "cap-shape",
+          "importance": 0.000616
+        },
+        {
+          "feature": "veil-color",
+          "importance": 0.000301
+        },
+        {
+          "feature": "gill-attachment",
+          "importance": 4.1e-05
+        },
+        {
+          "feature": "veil-type",
           "importance": 0.0
         }
       ]

@@ -1,6 +1,10 @@
 {
   "cap-shape": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "b",
       "label": "Bell"
     },
@@ -27,6 +31,10 @@
   ],
   "cap-surface": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "f",
       "label": "Fibrous"
     },
@@ -44,6 +52,10 @@
     }
   ],
   "cap-color": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "b",
       "label": "Buff"
@@ -87,6 +99,10 @@
   ],
   "bruises": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "f",
       "label": "No Bruises"
     },
@@ -96,6 +112,10 @@
     }
   ],
   "odor": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "a",
       "label": "Almond"
@@ -135,6 +155,10 @@
   ],
   "gill-attachment": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "a",
       "label": "Attached"
     },
@@ -144,6 +168,10 @@
     }
   ],
   "gill-spacing": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "c",
       "label": "Close"
@@ -155,6 +183,10 @@
   ],
   "gill-size": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "b",
       "label": "Broad"
     },
@@ -164,6 +196,10 @@
     }
   ],
   "gill-color": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "b",
       "label": "Buff"
@@ -215,6 +251,10 @@
   ],
   "stalk-shape": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "e",
       "label": "Enlarging"
     },
@@ -247,6 +287,10 @@
   ],
   "stalk-surface-above-ring": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "f",
       "label": "Fibrous"
     },
@@ -265,6 +309,10 @@
   ],
   "stalk-surface-below-ring": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "f",
       "label": "Fibrous"
     },
@@ -282,6 +330,10 @@
     }
   ],
   "stalk-color-above-ring": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "b",
       "label": "Buff"
@@ -321,6 +373,10 @@
   ],
   "stalk-color-below-ring": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "b",
       "label": "Buff"
     },
@@ -359,11 +415,19 @@
   ],
   "veil-type": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "p",
       "label": "Partial"
     }
   ],
   "veil-color": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "n",
       "label": "Brown"
@@ -383,6 +447,10 @@
   ],
   "ring-number": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "n",
       "label": "None"
     },
@@ -396,6 +464,10 @@
     }
   ],
   "ring-type": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "e",
       "label": "Evanescent"
@@ -418,6 +490,10 @@
     }
   ],
   "spore-print-color": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "b",
       "label": "Buff"
@@ -457,6 +533,10 @@
   ],
   "population": [
     {
+      "value": "?",
+      "label": "?"
+    },
+    {
       "value": "a",
       "label": "Abundant"
     },
@@ -482,6 +562,10 @@
     }
   ],
   "habitat": [
+    {
+      "value": "?",
+      "label": "?"
+    },
     {
       "value": "d",
       "label": "Woods"

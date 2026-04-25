@@ -6,6 +6,14 @@ import pandas as pd
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
+try:
+    from image_model import image_model_status, predict_image
+    IMAGE_PIPELINE_ERROR = None
+except Exception as e:
+    image_model_status = None
+    predict_image = None
+    IMAGE_PIPELINE_ERROR = str(e)
+
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -301,6 +309,51 @@ def classify_both():
     comparisons["models_agree"] = rf_pred == dt_pred
 
     return jsonify(comparisons)
+
+@app.route("/api/image-model/status", methods=["GET"])
+def get_image_model_status():
+    """Returns whether the computer-vision model is trained and loadable."""
+    if IMAGE_PIPELINE_ERROR:
+        return jsonify({
+            "available": False,
+            "error": IMAGE_PIPELINE_ERROR,
+        }), 503
+
+    return jsonify(image_model_status())
+
+@app.route("/api/predict-image", methods=["POST"])
+def predict_uploaded_image():
+    """
+    Predict mushroom species and edibility from an uploaded image.
+
+    Expects multipart/form-data with a file field named "image".
+    """
+    if IMAGE_PIPELINE_ERROR:
+        return jsonify({
+            "error": "Image prediction dependencies are not available",
+            "details": IMAGE_PIPELINE_ERROR,
+        }), 503
+
+    if "image" not in request.files:
+        return jsonify({"error": "Upload an image file using the 'image' field"}), 400
+
+    image_file = request.files["image"]
+    if not image_file.filename:
+        return jsonify({"error": "Uploaded image is missing a filename"}), 400
+
+    top_k = int(request.form.get("top_k", 3))
+    try:
+        return jsonify(predict_image(image_file, top_k=top_k))
+    except FileNotFoundError as e:
+        return jsonify({
+            "error": "Image model not trained",
+            "details": str(e),
+        }), 503
+    except Exception as e:
+        return jsonify({
+            "error": "Image prediction failed",
+            "details": str(e),
+        }), 400
 
 @app.route("/api/model/stats", methods=["GET"])
 def model_stats():

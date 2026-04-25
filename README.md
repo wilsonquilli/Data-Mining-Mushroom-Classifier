@@ -48,3 +48,106 @@ The goal of the Mushroom Classifier is to develop a **reliable and user-friendly
 - REST API
 - Random Forest & Decision Tree Algorithms
 - UCI Mushroom Dataset
+
+## Image-Based Mushroom Identification
+
+The original UCI mushroom dataset is tabular, not image-based. It is useful for
+the data mining portion of the project, but it cannot train a photo upload
+classifier. The project now includes a separate computer-vision pipeline for
+image datasets.
+
+### Image Dataset Layout
+
+Place mushroom images in species folders:
+
+```text
+backend/image_dataset/
+  Agaricus_bisporus/
+    image_001.jpg
+    image_002.jpg
+  Amanita_muscaria/
+    image_001.jpg
+  Amanita_phalloides/
+    image_001.jpg
+```
+
+Create an edibility map at `backend/edibility_map.json`. You can start from
+`backend/edibility_map.example.json`.
+
+```json
+{
+  "Agaricus_bisporus": "edible",
+  "Amanita_muscaria": "poisonous",
+  "Amanita_phalloides": "deadly"
+}
+```
+
+### Train the Image Model
+
+```bash
+cd backend
+pip install -r requirements.txt
+python train_image_model.py --data-dir image_dataset --edibility-map edibility_map.json
+```
+
+The training script uses transfer learning with EfficientNet-B0, ImageNet
+pretrained weights, stratified train/validation/test splits, class-weighted
+loss, data augmentation, fine-tuning, and early stopping. It saves:
+
+```text
+backend/models/image_classifier.pt
+backend/models/image_model_metadata.json
+```
+
+### Image Prediction API
+
+After training, the Flask backend exposes:
+
+```text
+GET  /api/image-model/status
+POST /api/predict-image
+```
+
+`POST /api/predict-image` expects multipart form data with an `image` field and
+returns predicted species, confidence, edibility, top predictions, and a safety
+warning.
+
+The current image pipeline is safety-first. It trains a calibrated risk head
+that returns:
+
+- `risk_label`: `edible`, `avoid`, or `uncertain`
+- `risk_confidence`: confidence for the safety decision
+- `species_suggestions`: optional top species matches
+- `warning`: a reminder not to consume wild mushrooms based only on the app
+
+For the practical project demo, `conditionally_edible`, `poisonous`, and
+`deadly` are treated as `avoid`. Species identification remains a secondary
+suggestion because the image dataset has many species with relatively few
+examples.
+
+To train the safety-first model:
+
+```bash
+cd backend
+python train_image_feature_heads.py \
+  --data-dir /path/to/mushroom_dataset \
+  --image-size 224 \
+  --batch-size 64 \
+  --head-epochs 300 \
+  --risk-epochs 300 \
+  --target-unsafe-recall 0.90
+```
+
+The training output reports risk accuracy, unsafe recall, edible precision,
+false-safe count/rate, and a binary confusion matrix. The app should prioritize
+unsafe recall and false-safe rate over exact species accuracy.
+
+### Overfitting Controls
+
+For the tabular UCI model, the project can reduce overfitting by masking some
+features, adding controlled categorical noise, removing overly predictive
+features such as odor in experiments, and relying on cross-validation instead of
+only a single train/test split.
+
+For the image model, the project uses augmentation, dropout, weight decay,
+class-weighted loss, early stopping, and a holdout test split.

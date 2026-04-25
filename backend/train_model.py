@@ -1,6 +1,10 @@
+from __future__ import annotations
+
+import argparse
 import os
 import json
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -138,6 +142,44 @@ def load_dataset():
     print(f"  Loaded {len(X)} rows, {X.shape[1]} features from local dataset.")
     return X, y
 
+def apply_dataset_noise(
+    X: pd.DataFrame,
+    noise_rate: float = 0.0,
+    mask_rate: float = 0.0,
+    drop_features: list[str] | None = None,
+    seed: int = 42,
+):
+    """
+    Adds controlled noise to reduce the overly clean nature of the UCI dataset.
+    Defaults keep the original dataset unchanged.
+    """
+    X_noisy = X.copy()
+    rng = np.random.default_rng(seed)
+
+    if drop_features:
+        existing = [feature for feature in drop_features if feature in X_noisy.columns]
+        if existing:
+            X_noisy = X_noisy.drop(columns=existing)
+            print(f"Dropped features for robustness experiment: {existing}")
+
+    if noise_rate > 0:
+        print(f"Applying categorical replacement noise at rate {noise_rate:.3f}...")
+        for column in X_noisy.columns:
+            values = X_noisy[column].dropna().astype(str).unique()
+            if len(values) <= 1:
+                continue
+            mask = rng.random(len(X_noisy)) < noise_rate
+            replacement_values = rng.choice(values, size=mask.sum(), replace=True)
+            X_noisy.loc[mask, column] = replacement_values
+
+    if mask_rate > 0:
+        print(f"Applying missing-value masking at rate {mask_rate:.3f}...")
+        for column in X_noisy.columns:
+            mask = rng.random(len(X_noisy)) < mask_rate
+            X_noisy.loc[mask, column] = "?"
+
+    return X_noisy
+
 def preprocess(X: pd.DataFrame, y: pd.Series):
     print("Preprocessing...")
 
@@ -257,8 +299,15 @@ def build_feature_mapping(X_raw: pd.DataFrame):
         mapping[col] = options
     return mapping
 
-def main():
+def main(args):
     X_raw, y_raw = load_dataset()
+    X_raw = apply_dataset_noise(
+        X_raw,
+        noise_rate=args.noise_rate,
+        mask_rate=args.mask_rate,
+        drop_features=args.drop_features,
+        seed=args.seed,
+    )
 
     df_full = X_raw.copy()
     df_full["poisonous"] = y_raw.values
@@ -284,6 +333,12 @@ def main():
         "edible_count": int((y_raw == "e").sum()),
         "poisonous_count": int((y_raw == "p").sum()),
         "dataset_source": RAW_DATASET_PATH,
+        "noise_config": {
+            "noise_rate": args.noise_rate,
+            "mask_rate": args.mask_rate,
+            "drop_features": args.drop_features,
+            "seed": args.seed,
+        },
         "models": results,
     }
     with open(METADATA_PATH, "w") as f:
@@ -305,4 +360,24 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Train tabular mushroom classifiers.")
+    parser.add_argument(
+        "--noise-rate",
+        type=float,
+        default=0.0,
+        help="Fraction of categorical cells to replace with another valid value.",
+    )
+    parser.add_argument(
+        "--mask-rate",
+        type=float,
+        default=0.0,
+        help="Fraction of categorical cells to replace with '?'.",
+    )
+    parser.add_argument(
+        "--drop-features",
+        nargs="*",
+        default=[],
+        help="Feature names to remove for robustness experiments, e.g. odor.",
+    )
+    parser.add_argument("--seed", type=int, default=42)
+    main(parser.parse_args())
