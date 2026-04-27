@@ -85,11 +85,89 @@ Species recognition is secondary because the image dataset has many species with
 
 ## Setup
 
-### Backend
+This section explains how to go from a fresh GitHub pull to a fully running app
+where users can upload mushroom pictures and get model predictions.
+
+### Required Software
+
+Install these first:
+
+- Git
+- Python `3.11+` recommended
+- Node.js `20+` recommended
+- npm, which comes with Node.js
+
+Backend Python dependencies are listed in:
+
+```text
+backend/requirements.txt
+```
+
+Frontend JavaScript dependencies are listed in:
+
+```text
+frontend/package.json
+```
+
+The trained image model is already included in:
+
+```text
+backend/models/image_classifier.pt
+backend/models/image_model_metadata.json
+```
+
+You do not need to retrain the model just to run the app.
+
+### 1. Clone or Pull the Project
+
+Fresh clone:
+
+```bash
+git clone https://github.com/wilsonquilli/Data-Mining-Mushroom-Classifier.git
+cd Data-Mining-Mushroom-Classifier
+```
+
+If you already cloned the repo:
+
+```bash
+cd Data-Mining-Mushroom-Classifier
+git pull origin main
+```
+
+### 2. Install Backend Dependencies
+
+From the project root:
 
 ```bash
 cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
+```
+
+On Windows PowerShell, activate the virtual environment with:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install Frontend Dependencies
+
+Open a new terminal from the project root:
+
+```bash
+cd frontend
+npm install
+```
+
+### 4. Run the Backend
+
+Open a terminal and run:
+
+```bash
+cd backend
+source .venv/bin/activate
 python3 app.py
 ```
 
@@ -99,11 +177,43 @@ The Flask backend runs at:
 http://127.0.0.1:5000
 ```
 
-### Frontend
+Keep this terminal open.
+
+You can verify the backend is working by visiting:
+
+```text
+http://127.0.0.1:5000/api/health
+```
+
+Expected result:
+
+```json
+{
+  "models_loaded": true,
+  "status": "ok"
+}
+```
+
+You can verify the image model is available by visiting:
+
+```text
+http://127.0.0.1:5000/api/image-model/status
+```
+
+Expected result includes:
+
+```json
+{
+  "available": true
+}
+```
+
+### 5. Run the Frontend
+
+Open a second terminal and run:
 
 ```bash
 cd frontend
-npm install
 npm run dev
 ```
 
@@ -114,6 +224,31 @@ http://127.0.0.1:5173
 ```
 
 If that port is busy, Vite will print another local URL such as `http://127.0.0.1:5174`.
+
+Keep this terminal open too.
+
+### 6. Test the Full App
+
+1. Open the Vite frontend URL in your browser.
+2. Go to the image upload section.
+3. Click `Choose Image`.
+4. Select a mushroom image from your computer.
+5. Click `Identify Mushroom`.
+6. The app will show:
+   - Safety result: `edible`, `avoid`, or `uncertain`
+   - Safety confidence
+   - #1 species candidate
+   - Possible species matches
+
+If the image section says `Needs Training`, check that these files exist:
+
+```text
+backend/models/image_classifier.pt
+backend/models/image_model_metadata.json
+```
+
+If the frontend cannot reach the backend, make sure Flask is running on port
+`5000` and that you started the frontend with `npm run dev`.
 
 ## API Endpoints
 
