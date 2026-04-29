@@ -362,6 +362,13 @@ The training output reports:
 
 | Name | Contribution |
 |------|--------------|
-| Wilson Quilli | Frontend with React and final report |
-| Mostafa Amer | Backend with Python and model training |
-| Mohamed Abdalla | Backend/frontend integration and final presentation |
+| **Wilson Quilli** | Frontend with React and wrote the final report |
+| **Mostafa Amer** | Built & trained Computer vision model and machine learning models. Backend with Python |
+| **Mohamed Abdalla** | Integrated backend and frontend; created the final presentation |
+
+## Technologies Used
+- Python (backend)
+- React (frontend)
+- REST API
+- Random Forest & Decision Tree Algorithms
+- UCI Mushroom Dataset
